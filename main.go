@@ -2,28 +2,12 @@ package main
 
 import "fmt"
 
-func plus(a, b int, name string) (int, string) {
-	return a + b, name
-}
-
-func multiplus(a ...int) int {
-	var total int = 0
-	for _, val := range a {
-		total += val
-	}
-
-	return total
-}
-
 func main() {
-	result, name := plus(2, 2, "nico")
-	fmt.Println(result, name)
+	var x int = 405940594059
+	fmt.Printf("%b\n", x)
+	fmt.Printf("%o\n", x)
+	fmt.Printf("%x\n", x)
 
-	result = multiplus(2, 2, 4, 5, 1, 2, 3)
-	fmt.Println(result)
-
-	var names string = "Nicolas!! is my name"
-	for idx, letter := range names {
-		fmt.Println(idx, letter, string(letter))
-	}
+	xAsBinary := fmt.Sprintf("%b\n", x)
+	fmt.Println(x, xAsBinary)
 }
