@@ -3,17 +3,12 @@ package main
 import "fmt"
 
 func main() {
-	// slice
-	foods := []string{"potato", "pizza", "pasta"}
+	var a int = 2
+	var b int = a
+	var c *int = &a
 
-	// array
-	// foods := [3]string{"potato", "pizza", "pasta"}
-	for _, food := range foods {
-		fmt.Println(food)
-	}
+	a = 12
 
-	foods = append(foods, "tomato")
-	for i := 0; i < len(foods); i++ {
-		fmt.Println(foods[i])
-	}
+	fmt.Println(b)
+	fmt.Println(*c)
 }
