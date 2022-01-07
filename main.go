@@ -1,19 +1,20 @@
 package main
 
 import (
+	"fmt"
 	"log"
-
-	"github.com/kadragon/nomadcoin/blockchain"
+	"net/http"
 )
 
+const port string = ":4000"
+
+func home(rw http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(rw, "Hello from home!")
+}
+
 func main() {
-	chain := blockchain.GetBlockchain()
+	http.HandleFunc("/", home)
 
-	chain.AddBlock("Second Block")
-	chain.AddBlock("Third Block")
-	chain.AddBlock("Fourth Block")
-
-	for _, block := range chain.Allblocks() {
-		log.Println(block.Hash)
-	}
+	fmt.Printf("Listening on http://localhost%s\n", port)
+	log.Fatal(http.ListenAndServe(port, nil))
 }
