@@ -3,11 +3,17 @@ package main
 import "fmt"
 
 func main() {
-	var x int = 405940594059
-	fmt.Printf("%b\n", x)
-	fmt.Printf("%o\n", x)
-	fmt.Printf("%x\n", x)
+	// slice
+	foods := []string{"potato", "pizza", "pasta"}
 
-	xAsBinary := fmt.Sprintf("%b\n", x)
-	fmt.Println(x, xAsBinary)
+	// array
+	// foods := [3]string{"potato", "pizza", "pasta"}
+	for _, food := range foods {
+		fmt.Println(food)
+	}
+
+	foods = append(foods, "tomato")
+	for i := 0; i < len(foods); i++ {
+		fmt.Println(foods[i])
+	}
 }
