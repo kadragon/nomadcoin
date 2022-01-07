@@ -7,9 +7,9 @@ import (
 )
 
 type block struct {
-	data     string
-	hash     string
-	prevHash string
+	Data     string
+	Hash     string
+	PrevHash string
 }
 
 type blockchain struct {
@@ -21,8 +21,8 @@ var once sync.Once // 무조건 한번만 실행하는것을 보장하기 위해
 
 // calculateHash calculate hash with block data, prevHash
 func (b *block) calculateHash() {
-	hash := sha256.Sum256([]byte(b.data + b.prevHash))
-	b.hash = fmt.Sprintf("%x", hash)
+	hash := sha256.Sum256([]byte(b.Data + b.PrevHash))
+	b.Hash = fmt.Sprintf("%x", hash)
 }
 
 // getLastHash block의 길이를 측정해서, block이 없을 경우 빈 hash를
@@ -33,7 +33,7 @@ func getLastHash() string {
 		return ""
 	}
 
-	return GetBlockchain().blocks[totalBlocks-1].hash
+	return GetBlockchain().blocks[totalBlocks-1].Hash
 }
 
 // createBlock data를 입력 받아, 새로운 block을 만든다.
@@ -45,13 +45,21 @@ func createBlock(data string) *block {
 	return &newblock
 }
 
+func (b *blockchain) AddBlock(data string) {
+	b.blocks = append(b.blocks, createBlock(data))
+}
+
 func GetBlockchain() *blockchain {
 	if b == nil {
 		once.Do(func() {
 			b = &blockchain{}
-			b.blocks = append(b.blocks, createBlock("Genesis Block"))
+			b.AddBlock("Genesis")
 		})
 	}
 
 	return b
+}
+
+func (b *blockchain) Allblocks() []*block {
+	return b.blocks
 }
