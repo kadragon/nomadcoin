@@ -1,12 +1,15 @@
 {{define "add"}}
 <!DOCTYPE html>
 <html lang="ko">
-    {{template "head"}}
+    {{template "head" "Add"}}
 
     <body>
     <main>
-        <form>
-            <input type="text" placeholder="Data for your block" required />
+        {{template "header" "Add"}}
+        
+        <form method="POST">
+            <input type="text" placeholder="Data for your block" required name="blockData" />
+            <button>Add Block</button>
         </form>
     </main>
     {{template "footer"}}

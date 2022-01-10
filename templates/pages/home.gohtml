@@ -1,14 +1,14 @@
 {{define "home"}}
 <!DOCTYPE html>
 <html lang="ko">
-    {{template "head"}}
+    {{template "head" .PageTitle}}
 
     <body>
     <main>
-        {{template "header"}}    
+        {{template "header" .PageTitle}}
         
         {{range .Blocks}}
-            {{template "block"}}
+            {{template "block" .}}
         {{end}}
     </main>
     {{template "footer"}}
