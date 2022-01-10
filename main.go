@@ -9,7 +9,12 @@ import (
 	"github.com/kadragon/nomadcoin/blockchain"
 )
 
-const port string = ":4000"
+const (
+	port        string = ":4000"
+	templateDir string = "templates/"
+)
+
+var templates *template.Template
 
 type homeData struct {
 	PageTitle string
@@ -17,13 +22,14 @@ type homeData struct {
 }
 
 func home(wr http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/page/home.gohtml"))
-
 	data := homeData{"Home", blockchain.GetBlockchain().Allblocks()}
-	tmpl.Execute(wr, data)
+	templates.ExecuteTemplate(wr, "home", data)
 }
 
 func main() {
+	templates = template.Must(template.ParseGlob(templateDir + "pages/*.gohtml"))
+	templates = template.Must(templates.ParseGlob(templateDir + "partials/*.gohtml"))
+
 	http.HandleFunc("/", home)
 
 	fmt.Printf("Listening on http://localhost%s\n", port)
