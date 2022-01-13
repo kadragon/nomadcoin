@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/kadragon/nomadcoin/blockchain"
@@ -45,7 +46,7 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 			Payload:     "data:string",
 		},
 		{
-			URL:         url("/blocks/{id}"),
+			URL:         url("/blocks/{height}"),
 			Method:      "GET",
 			Description: "See A Block",
 		},
@@ -77,7 +78,15 @@ func blocks(rw http.ResponseWriter, r *http.Request) {
 
 func block(rw http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id := vars["id"]
+	id := vars["height"]
+	height, err := strconv.Atoi(id)
+	utils.HandleErr(err)
+
+	block := blockchain.GetBlockchain().GetBlock(height)
+
+	rw.Header().Add("Content-Type", "Application/json")
+	err = json.NewEncoder(rw).Encode(block)
+	utils.HandleErr(err)
 }
 
 func Start(aPort int) {
@@ -88,7 +97,7 @@ func Start(aPort int) {
 
 	handler.HandleFunc("/", documentation).Methods("GET")
 	handler.HandleFunc("/blocks", blocks).Methods("GET", "POST")
-	handler.HandleFunc("/blocks/{id:[0-9]+}", block).Methods("GET")
+	handler.HandleFunc("/blocks/{height:[0-9]+}", block).Methods("GET")
 
 	fmt.Printf("Listening on http://localhost%s\n", port)
 	log.Fatal(http.ListenAndServe(port, handler))
