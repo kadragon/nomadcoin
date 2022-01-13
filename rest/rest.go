@@ -36,7 +36,7 @@ type errorResponse struct {
 	ErrorMessage string `json:"errorMessage"`
 }
 
-func documentation(rw http.ResponseWriter, r *http.Request) {
+func documentation(w http.ResponseWriter, r *http.Request) {
 	data := []urlDescription{
 		{
 			URL:         url("/"),
@@ -56,17 +56,14 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	rw.Header().Add("Content-Type", "Application/json")
-
-	err := json.NewEncoder(rw).Encode(data)
+	err := json.NewEncoder(w).Encode(data)
 	utils.HandleErr(err)
 }
 
-func blocks(rw http.ResponseWriter, r *http.Request) {
+func blocks(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		rw.Header().Add("Content-Type", "Application/json")
-		json.NewEncoder(rw).Encode(blockchain.GetBlockchain().Allblocks())
+		json.NewEncoder(w).Encode(blockchain.GetBlockchain().Allblocks())
 
 	case "POST":
 		var addBlockBody addBlockBody
@@ -76,11 +73,11 @@ func blocks(rw http.ResponseWriter, r *http.Request) {
 
 		blockchain.GetBlockchain().AddBlock(addBlockBody.Message)
 
-		rw.WriteHeader(http.StatusCreated)
+		w.WriteHeader(http.StatusCreated)
 	}
 }
 
-func block(rw http.ResponseWriter, r *http.Request) {
+func block(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["height"]
 	height, err := strconv.Atoi(id)
@@ -88,7 +85,7 @@ func block(rw http.ResponseWriter, r *http.Request) {
 
 	block, err := blockchain.GetBlockchain().GetBlock(height)
 
-	encoder := json.NewEncoder(rw)
+	encoder := json.NewEncoder(w)
 	if err == blockchain.ErrNotFound {
 		encoder.Encode(errorResponse{fmt.Sprintf("%s", err)})
 	} else {
@@ -96,16 +93,24 @@ func block(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func jsonContentTypeMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "Application/json")
+		next.ServeHTTP(w, r)
+	})
+}
+
 func Start(aPort int) {
 	// gorilla mux 사용
-	handler := mux.NewRouter()
+	router := mux.NewRouter()
+	router.Use(jsonContentTypeMiddleware)
 
 	port = fmt.Sprintf(":%d", aPort)
 
-	handler.HandleFunc("/", documentation).Methods("GET")
-	handler.HandleFunc("/blocks", blocks).Methods("GET", "POST")
-	handler.HandleFunc("/blocks/{height:[0-9]+}", block).Methods("GET")
+	router.HandleFunc("/", documentation).Methods("GET")
+	router.HandleFunc("/blocks", blocks).Methods("GET", "POST")
+	router.HandleFunc("/blocks/{height:[0-9]+}", block).Methods("GET")
 
 	fmt.Printf("Listening on http://localhost%s\n", port)
-	log.Fatal(http.ListenAndServe(port, handler))
+	log.Fatal(http.ListenAndServe(port, router))
 }
