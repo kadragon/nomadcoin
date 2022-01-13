@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/kadragon/nomadcoin/blockchain"
 	"github.com/kadragon/nomadcoin/utils"
 )
 
@@ -25,6 +26,10 @@ type URLDescription struct {
 	Payload     string `json:"payload,omitempty"`
 }
 
+type AddBlockBody struct {
+	Message string
+}
+
 func documentation(rw http.ResponseWriter, r *http.Request) {
 	data := []URLDescription{
 		{
@@ -38,6 +43,11 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 			Description: "Add A Block",
 			Payload:     "data:string",
 		},
+		{
+			URL:         url("/blocks/{id}"),
+			Method:      "GET",
+			Description: "See A Block",
+		},
 	}
 
 	rw.Header().Add("Content-Type", "Application/json")
@@ -46,8 +56,27 @@ func documentation(rw http.ResponseWriter, r *http.Request) {
 	utils.HandleErr(err)
 }
 
+func blocks(rw http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		rw.Header().Add("Content-Type", "Application/json")
+		json.NewEncoder(rw).Encode(blockchain.GetBlockchain().Allblocks())
+
+	case "POST":
+		var addBlockBody AddBlockBody
+
+		err := json.NewDecoder(r.Body).Decode(&addBlockBody)
+		utils.HandleErr(err)
+
+		blockchain.GetBlockchain().AddBlock(addBlockBody.Message)
+
+		rw.WriteHeader(http.StatusCreated)
+	}
+}
+
 func main() {
 	http.HandleFunc("/", documentation)
+	http.HandleFunc("/blocks", blocks)
 
 	fmt.Printf("Listening on http://localhost%s\n", port)
 	log.Fatal(http.ListenAndServe(port, nil))
