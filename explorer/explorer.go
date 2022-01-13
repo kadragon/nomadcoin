@@ -21,6 +21,11 @@ type homeData struct {
 	Blocks    []*blockchain.Block
 }
 
+func init() {
+	templates = template.Must(template.ParseGlob(templateDir + "pages/*.gohtml"))
+	templates = template.Must(templates.ParseGlob(templateDir + "partials/*.gohtml"))
+}
+
 func home(rw http.ResponseWriter, r *http.Request) {
 	data := homeData{"Home", blockchain.GetBlockchain().Allblocks()}
 	templates.ExecuteTemplate(rw, "home", data)
@@ -43,8 +48,6 @@ func add(rw http.ResponseWriter, r *http.Request) {
 }
 
 func Start() {
-	templates = template.Must(template.ParseGlob(templateDir + "pages/*.gohtml"))
-	templates = template.Must(templates.ParseGlob(templateDir + "partials/*.gohtml"))
 
 	http.HandleFunc("/", home)
 	http.HandleFunc("/add", add)
