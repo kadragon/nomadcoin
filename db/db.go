@@ -1,6 +1,8 @@
 package db
 
 import (
+	"fmt"
+
 	"github.com/boltdb/bolt"
 	"github.com/kadragon/nomadcoin/utils"
 )
@@ -30,4 +32,23 @@ func DB() *bolt.DB {
 	}
 
 	return db
+}
+
+func SaveBlock(hash string, data []byte) {
+	fmt.Printf("Saving Block %s\nData: %b", hash, data)
+
+	err := DB().Update(func(t *bolt.Tx) error {
+		bucket := t.Bucket([]byte(blocksBucket))
+		err := bucket.Put([]byte(hash), data)
+		return err
+	})
+	utils.HandleErr(err)
+}
+
+func SaveBlockchain(data []byte) {
+	err := DB().Update(func(t *bolt.Tx) error {
+		bucket := t.Bucket([]byte(dataBucket))
+		return bucket.Put([]byte("checkpoint"), data)
+	})
+	utils.HandleErr(err)
 }

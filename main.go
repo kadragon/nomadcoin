@@ -1,7 +1,7 @@
 package main
 
-import "github.com/kadragon/nomadcoin/cli"
+import "github.com/kadragon/nomadcoin/blockchain"
 
 func main() {
-	cli.Start()
+	blockchain.Blockchain()
 }
