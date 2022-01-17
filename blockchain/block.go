@@ -2,6 +2,7 @@ package blockchain
 
 import (
 	"crypto/sha256"
+	"errors"
 	"fmt"
 
 	"github.com/kadragon/nomadcoin/db"
@@ -33,4 +34,23 @@ func createBlock(data string, prevHash string, height int) *Block {
 	block.persist()
 
 	return block
+}
+
+var ErrNotFound = errors.New("block not found")
+
+func (b *Block) restore(data []byte) {
+	utils.FromBytes(b, data)
+}
+
+func FindBlock(hash string) (*Block, error) {
+	blockByte := db.Block(hash)
+
+	if blockByte == nil {
+		return nil, ErrNotFound
+	}
+
+	block := &Block{}
+	block.restore(blockByte)
+
+	return block, nil
 }
