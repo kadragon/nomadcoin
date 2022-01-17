@@ -1,9 +1,7 @@
 package blockchain
 
 import (
-	"bytes"
 	"crypto/sha256"
-	"encoding/gob"
 	"fmt"
 
 	"github.com/kadragon/nomadcoin/db"
@@ -17,18 +15,8 @@ type Block struct {
 	Height   int    `json:"height"`
 }
 
-func (b *Block) toByte() []byte {
-	var blockBuffer bytes.Buffer
-	encoder := gob.NewEncoder(&blockBuffer)
-
-	err := encoder.Encode(b)
-	utils.HandleErr(err)
-
-	return blockBuffer.Bytes()
-}
-
 func (b *Block) persist() {
-	db.SaveBlock(b.Hash, b.toByte())
+	db.SaveBlock(b.Hash, utils.ToBytes(b))
 }
 
 func createBlock(data string, prevHash string, height int) *Block {
