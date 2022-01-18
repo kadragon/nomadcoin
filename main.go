@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/kadragon/nomadcoin/blockchain"
 	"github.com/kadragon/nomadcoin/cli"
+	"github.com/kadragon/nomadcoin/db"
 )
 
 func main() {
-	blockchain.Blockchain()
+	defer db.Close()
 	cli.Start()
 }

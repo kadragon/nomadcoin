@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/kadragon/nomadcoin/explorer"
 	"github.com/kadragon/nomadcoin/rest"
@@ -15,7 +16,7 @@ func usage() {
 	fmt.Printf("-port:	Set the Port of the server\n")
 	fmt.Printf("-mode:	Choose between 'html' or 'rest' or 'all'\n")
 
-	os.Exit(0)
+	runtime.Goexit()
 }
 
 func Start() {

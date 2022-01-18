@@ -27,9 +27,9 @@ type urlDescription struct {
 	Payload     string `json:"payload,omitempty"`
 }
 
-// type addBlockBody struct {
-// 	Message string
-// }
+type addBlockBody struct {
+	Message string
+}
 
 type errorResponse struct {
 	ErrorMessage string `json:"errorMessage"`
@@ -62,19 +62,17 @@ func documentation(w http.ResponseWriter, r *http.Request) {
 func blocks(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		return
-		// json.NewEncoder(w).Encode(blockchain.GetBlockchain().Allblocks())
+		json.NewEncoder(w).Encode(blockchain.Blockchain().Blocks())
 
 	case "POST":
-		return
-		// var addBlockBody addBlockBody
+		var addBlockBody addBlockBody
 
-		// err := json.NewDecoder(r.Body).Decode(&addBlockBody)
-		// utils.HandleErr(err)
+		err := json.NewDecoder(r.Body).Decode(&addBlockBody)
+		utils.HandleErr(err)
 
-		// blockchain.GetBlockchain().AddBlock(addBlockBody.Message)
+		blockchain.Blockchain().AddBlock(addBlockBody.Message)
 
-		// w.WriteHeader(http.StatusCreated)
+		w.WriteHeader(http.StatusCreated)
 	}
 }
 
